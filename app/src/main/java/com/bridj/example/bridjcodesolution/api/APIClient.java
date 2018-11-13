@@ -15,7 +15,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import java.util.function.Predicate;
 
 public class APIClient {
     private final static String EVENTS_DATA_URL = "https://s3-ap-southeast-2.amazonaws.com/bridj-coding-challenge/events.json";
