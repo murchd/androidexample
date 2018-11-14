@@ -1,5 +1,6 @@
 package com.bridj.example.bridjcodesolution.api;
 
+import com.bridj.example.bridjcodesolution.dao.Filterable;
 import com.bridj.example.bridjcodesolution.entities.Event;
 
 import org.json.JSONArray;
@@ -19,7 +20,7 @@ import okhttp3.ResponseBody;
 public class APIClient {
     private final static String EVENTS_DATA_URL = "https://s3-ap-southeast-2.amazonaws.com/bridj-coding-challenge/events.json";
 
-    public static List<Event> getEvents() throws APIException {
+    public List<Event> getEvents(Filterable<Event> filter) throws APIException {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
@@ -40,11 +41,15 @@ public class APIClient {
             }
             JSONObject res = new JSONObject(body.string());
             JSONArray jEvents = res.getJSONArray("events");
-            List<Event> ret = new ArrayList<>();
+            List<Event> events = new ArrayList<>();
             for (int i = 0; i<jEvents.length(); i++) {
-                ret.add(new Event(jEvents.getJSONObject(i)));
+                Event event = new Event(jEvents.getJSONObject(i));
+                if(filter.pass(event)) {
+                    events.add(event);
+                }
+
             }
-            return ret;
+            return events;
         } catch (IOException e) {
             throw new APIException(e.getMessage(), e);
         } catch (JSONException e) {

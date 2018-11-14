@@ -1,28 +1,35 @@
 package com.bridj.example.bridjcodesolution.dao;
 
-import android.support.annotation.NonNull;
-
 import com.bridj.example.bridjcodesolution.api.APIClient;
 import com.bridj.example.bridjcodesolution.api.APIException;
 import com.bridj.example.bridjcodesolution.entities.Event;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class EventDAO {
 
-    public List<Event> getAllEvents() throws APIException {
-        return APIClient.getEvents();
+    public List<Event> getEventsWithAvaiableSeats() throws APIException {
+        return new APIClient().getEvents(new Filterable<Event>() {
+
+            @Override
+            public boolean pass(Event o) {
+                return o.getAvailableSeats() > 0;
+            }
+
+        });
     }
 
-    public List<Event> filterWithAvailableSeats(List<Event> events) throws APIException {
-        List<Event> events = getAllEvents();
+    public void sortByDate(List<Event> events) {
+        Collections.sort(events, sortByDate);
     }
 
-    private Comparable<Event> sortByDate = new Comparable<Event>() {
+    private Comparator<Event> sortByDate = new Comparator<Event>() {
         @Override
-        public int compareTo(@NonNull Event o) {
-            return 0;
+        public int compare(Event o1, Event o2) {
+            return o1.getDate().compareTo(o2.getDate());
         }
-    }
+    };
 
 }
