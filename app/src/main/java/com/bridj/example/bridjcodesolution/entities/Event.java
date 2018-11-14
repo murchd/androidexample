@@ -1,5 +1,8 @@
 package com.bridj.example.bridjcodesolution.entities;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,14 +14,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Event {
+public class Event implements Parcelable {
 
     private final String name;
     private final Date date;
     private final int availableSeats;
     private final double price;
     private final String venue;
-    private final List<String> labels = new ArrayList<>();
+    private final List<String> labels;
 
     public Event(JSONObject json) throws JSONException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ", Locale.ENGLISH);
@@ -27,11 +30,33 @@ public class Event {
         availableSeats = json.getInt("available_seats");
         price = json.getDouble("price");
         venue = json.getString("venue");
+        labels = new ArrayList<>();
         JSONArray jLabels = json.getJSONArray("labels");
         for(int i = 0; i<jLabels.length(); i++){
             labels.add(jLabels.getString(i));
         }
     }
+
+    protected Event(Parcel in) {
+        name = in.readString();
+        availableSeats = in.readInt();
+        price = in.readDouble();
+        venue = in.readString();
+        labels = in.createStringArrayList();
+        date = new Date(in.readLong());
+    }
+
+    public static final Creator<Event> CREATOR = new Creator<Event>() {
+        @Override
+        public Event createFromParcel(Parcel in) {
+            return new Event(in);
+        }
+
+        @Override
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
 
     public String getName() {
         return name;
@@ -55,5 +80,20 @@ public class Event {
 
     public List<String> getLabels() {
         return labels;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeInt(availableSeats);
+        dest.writeDouble(price);
+        dest.writeString(venue);
+        dest.writeStringList(labels);
+        dest.writeLong(date.getTime());
     }
 }
