@@ -20,6 +20,13 @@ import okhttp3.ResponseBody;
 public class APIClient {
     private final static String EVENTS_DATA_URL = "https://s3-ap-southeast-2.amazonaws.com/bridj-coding-challenge/events.json";
 
+    /**
+     * Fetch events from HTTP endpoint using OKHttp client. This lib was closed because it has a simple API and it a modern maintained lib.
+     * Android URLConnection actually is just a wrapper of okhttp in recent versions
+     * @param filter impl of Filterable to provide logic at fetch parse time
+     * @return list of event objects
+     * @throws APIException if there was a problem with connecting to the endpoint or parsing the results
+     */
     public List<Event> getEvents(Filterable<Event> filter) throws APIException {
         OkHttpClient client = new OkHttpClient();
 

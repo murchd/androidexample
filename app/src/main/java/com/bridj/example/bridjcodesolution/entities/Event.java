@@ -23,6 +23,12 @@ public class Event implements Parcelable {
     private final String venue;
     private final List<String> labels;
 
+    /**
+     * construct from json
+     * @param json the json object
+     * @throws JSONException json parsing error
+     * @throws ParseException date parsing error
+     */
     public Event(JSONObject json) throws JSONException, ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ", Locale.ENGLISH);
         name = json.getString("name");
@@ -37,6 +43,15 @@ public class Event implements Parcelable {
         }
     }
 
+    /**
+     * construct from values
+     * @param name name of event
+     * @param date date of event
+     * @param availableSeats num seats
+     * @param price price
+     * @param venue venue name
+     * @param labels list of labels
+     */
     public Event(String name, Date date, int availableSeats, double price, String venue, List<String> labels) {
         this.name = name;
         this.date = date;
@@ -46,6 +61,10 @@ public class Event implements Parcelable {
         this.labels = labels;
     }
 
+    /**
+     * used by android to build from parcel
+     * @param in the parcel
+     */
     protected Event(Parcel in) {
         name = in.readString();
         availableSeats = in.readInt();
@@ -91,10 +110,19 @@ public class Event implements Parcelable {
         return labels;
     }
 
+    /**
+     * check for available seats
+     * @return returns true if there are available seats
+     */
     public boolean hasAvailableSeats() {
         return getAvailableSeats() > 0;
     }
 
+    /**
+     * Check for match of label
+     * @param label the label to check
+     * @return
+     */
     public boolean hasLabel(String label) {
         return getLabels().contains(label.toLowerCase());
     }

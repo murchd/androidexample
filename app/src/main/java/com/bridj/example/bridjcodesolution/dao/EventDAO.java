@@ -10,6 +10,11 @@ import java.util.List;
 
 public class EventDAO {
 
+    /**
+     * returns list of Events filtering out those with no available seats
+     * @return the List of events
+     * @throws APIException if there was a problem fetching the events from the data source
+     */
     public List<Event> getEventsWithAvailableSeats() throws APIException {
         return new APIClient().getEvents(new Filterable<Event>() {
 
@@ -21,10 +26,15 @@ public class EventDAO {
         });
     }
 
+    /**
+     * Sort events by date
+     * @param events the collection reference
+     */
     public void sortByDateDesc(List<Event> events) {
         Collections.sort(events, sortByDateDesc);
     }
 
+    // Comparator for sorting date
     private Comparator<Event> sortByDateDesc = new Comparator<Event>() {
         @Override
         public int compare(Event o1, Event o2) {
