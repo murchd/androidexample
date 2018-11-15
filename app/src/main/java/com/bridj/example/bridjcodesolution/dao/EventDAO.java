@@ -10,25 +10,31 @@ import java.util.List;
 
 public class EventDAO {
 
-    public List<Event> getEventsWithAvaiableSeats() throws APIException {
+    public List<Event> getEventsWithAvailableSeats() throws APIException {
         return new APIClient().getEvents(new Filterable<Event>() {
 
             @Override
             public boolean pass(Event o) {
-                return o.getAvailableSeats() > 0;
+                return o.hasAvailableSeats();
             }
 
         });
     }
 
-    public void sortByDate(List<Event> events) {
-        Collections.sort(events, sortByDate);
+    public void sortByDateDesc(List<Event> events) {
+        Collections.sort(events, sortByDateDesc);
     }
 
-    private Comparator<Event> sortByDate = new Comparator<Event>() {
+    private Comparator<Event> sortByDateDesc = new Comparator<Event>() {
         @Override
         public int compare(Event o1, Event o2) {
-            return o1.getDate().compareTo(o2.getDate());
+            if(o1.getDate().after(o2.getDate())) {
+                return -1;
+            }
+            if(o1.getDate().before(o2.getDate())) {
+                return 1;
+            }
+            return 0;
         }
     };
 

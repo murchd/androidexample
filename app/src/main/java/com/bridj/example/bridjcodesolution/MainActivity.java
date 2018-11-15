@@ -1,15 +1,17 @@
 package com.bridj.example.bridjcodesolution;
 
 import android.os.AsyncTask;
-import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
 
+import com.bridj.example.bridjcodesolution.api.APIException;
+import com.bridj.example.bridjcodesolution.dao.EventDAO;
 import com.bridj.example.bridjcodesolution.entities.Event;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class MainActivity extends AppCompatActivity {
     ArrayList<Event> eventsList = new ArrayList<>();
@@ -20,12 +22,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if(savedInstanceState == null) {
-            FetchEventsTask fetchEventsTask = new FetchEventsTask();
-            fetchEventsTask.execute();
+            refreshEventList();
         } else {
-            savedInstanceState.getParcelableArrayList("events");
+            eventsList = savedInstanceState.getParcelableArrayList("events");
         }
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_refresh:
+                refreshEventList();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshEventList() {
+        FetchEventsTask fetchEventsTask = new FetchEventsTask();
+        fetchEventsTask.execute();
+    }
+
+    private void displayEvents() {
+        logToConsole("*** Events (with available seats) ***");
+        for(Event e : eventsList) {
+            logToConsole(e.toString());
+        }
+        logToConsole("*** Events (with available seats and label of 'play') ***");
+        for(Event e : eventsList) {
+            if(e.hasLabel("play")) {
+                logToConsole(e.toString());
+            }
+        }
+    }
+
+    private void logToConsole(String str) {
+        Log.d("[Bridj Example]", str);
     }
 
     @Override
@@ -40,21 +71,29 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
-    static class FetchEventsTask extends AsyncTask<Boolean, Boolean, Boolean> {
+    private class FetchEventsTask extends AsyncTask<Boolean, Boolean, Boolean> {
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
+        protected void onPostExecute(Boolean success) {
+            if(success) {
+                MainActivity.this.displayEvents();
+            }
         }
 
         @Override
         protected Boolean doInBackground(Boolean... booleans) {
+            EventDAO dao = new EventDAO();
             try {
-                Thread.sleep(5000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                List<Event> results = dao.getEventsWithAvailableSeats();
+                dao.sortByDateDesc(results);
+                MainActivity.this.eventsList.clear();
+                MainActivity.this.eventsList.addAll(results);
+                return true;
+            }catch (APIException ex) {
+                ex.printStackTrace();
             }
-            return null;
+            return false;
+
         }
     }
 

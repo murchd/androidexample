@@ -33,8 +33,17 @@ public class Event implements Parcelable {
         labels = new ArrayList<>();
         JSONArray jLabels = json.getJSONArray("labels");
         for(int i = 0; i<jLabels.length(); i++){
-            labels.add(jLabels.getString(i));
+            labels.add(jLabels.getString(i).toLowerCase());
         }
+    }
+
+    public Event(String name, Date date, int availableSeats, double price, String venue, List<String> labels) {
+        this.name = name;
+        this.date = date;
+        this.availableSeats = availableSeats;
+        this.price = price;
+        this.venue = venue;
+        this.labels = labels;
     }
 
     protected Event(Parcel in) {
@@ -82,6 +91,14 @@ public class Event implements Parcelable {
         return labels;
     }
 
+    public boolean hasAvailableSeats() {
+        return getAvailableSeats() > 0;
+    }
+
+    public boolean hasLabel(String label) {
+        return getLabels().contains(label.toLowerCase());
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -95,5 +112,14 @@ public class Event implements Parcelable {
         dest.writeString(venue);
         dest.writeStringList(labels);
         dest.writeLong(date.getTime());
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "name='" + getName() + '\'' +
+                ", price=" + getPrice() +
+                ", venue='" + getVenue() + '\'' +
+                '}';
     }
 }
