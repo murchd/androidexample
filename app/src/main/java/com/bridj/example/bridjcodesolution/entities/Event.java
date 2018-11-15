@@ -30,7 +30,7 @@ public class Event implements Parcelable {
      * @throws ParseException date parsing error
      */
     public Event(JSONObject json) throws JSONException, ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ", Locale.ENGLISH);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
         name = json.getString("name");
         date = sdf.parse(json.getString("date"));
         availableSeats = json.getInt("available_seats");
